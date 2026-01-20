@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sắp xếp câu THPTQG</title>
+
+<style>
+#homeBtn{font-size:26px;text-decoration:none;margin-right:10px;color:#fff;
+position:absolute;left:10px;top:8px;transition:.25s;}
+#homeBtn:hover{color:#ffd700;cursor:pointer;}
+
+body{font-family:Arial,sans-serif;margin:0;background:#f5f5f5;}
+header{background:#213C51;color:#fff;padding:10px;text-align:center;}
+#timer{font-size:20px;margin-top:5px;}
+
+.container{width:90%;max-width:900px;margin:20px auto;background:#fff;
+padding:20px;border-radius:8px;box-shadow:0 0 8px rgba(0,0,0,0.1);}
+
+.instruction{
+font-size:20px;margin-bottom:15px;font-weight:600;color:#333;
+}
+
+.reading-box{
+border:1px solid #ccc;padding:10px;height:300px;overflow-y:auto;
+border-radius:6px;background:#fafafa;margin-bottom:10px;font-size:20px;}
+
+.questions-box{
+border:1px solid #ccc;padding:10px;height:130px;overflow-y:auto;
+border-radius:6px;background:#ECF4E8;margin-bottom:10px;font-size:20px;}
+
+#questions label{display:flex;align-items:center;margin:8px 0;gap:8px;}
+
+.buttons{display:flex;gap:10px;margin-top:10px;}
+.buttons .right{margin-left:auto;}
+button{font-size:18px;padding:10px 18px;font-weight:600;border-radius:6px;
+transition:.2s;}
+button:hover{background:#e0e0e0;cursor:pointer;}
+
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);
+display:none;justify-content:center;align-items:center;}
+.modal-content{background:#fff;padding:18px;border-radius:6px;text-align:center;
+width:280px;box-shadow:0 0 8px rgba(0,0,0,0.3);}
+.modal button{margin:5px;padding:6px 14px;}
+
+#noteBox{width:90%;height:120px;margin-top:12px;border:1px solid #ccc;
+border-radius:6px;padding:8px;font-size:18px;color:#F63049;background:#fffef7;
+resize:vertical;}
+
+#answerBox{
+width:90%;
+max-width:900px;
+margin:20px auto;
+background:#fffef7;
+border-left:6px solid #28a745;
+padding:15px;
+font-size:20px;
+border-radius:8px;
+}
+
+.highlighted{
+  background:yellow;
+  padding:1px 2px;
+  border-radius:3px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+<header>
+<a id="homeBtn" href="https://ketng91.github.io/khoathpt/">🏠</a>
+<h2>Luyện sắp xếp câu THPTQG-Đề 02</h2>
+<div id="timer">00:00</div>
+</header>
+
+<div class="container">
+<div class="instruction">
+Mark the letter A, B, C or D to indicate the best arrangement of utterances or sentences to make a cohesive and coherent exchange or text in each of the following questions
+</div>
+
+<div class="reading-box" id="reading"></div>
+<div class="questions-box" id="questions"></div>
+
+<div class="buttons">
+<button onclick="prevQ()">Back</button>
+<button onclick="nextQ()">Next</button>
+<button class="right" onclick="openConfirm()">Submit</button>
+</div>
+
+<textarea id="noteBox" placeholder="Ghi chú khi làm bài..."></textarea>
+</div>
+
+<div id="answerBox"></div>
+
+<div class="modal" id="confirmBox">
+<div class="modal-content">
+<p>Bạn muốn nộp bài?</p>
+<button onclick="submitTest()">Yes</button>
+<button onclick="closeConfirm()">No</button>
+</div>
+</div>
+
+<script>
+// TIMER
+// TIMER
+let sec = 0;
+let timerInterval = setInterval(() => {
+  sec++;
+  let m = Math.floor(sec / 60),
+      s = sec % 60;
+  document.getElementById('timer').innerText =
+    (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+}, 1000);
+
+// LƯU ĐÁP ÁN
+let answers = new Array(5).fill(null);
+
+// 5 BÀI
+const exercises=[
+{
+  q: "Question 1",
+  passage: "a. Anna: I just heard APT on YouTube, and it made my day!<br><br>b. Ben: That’s awesome! I love that song too; it always puts me in a good mood.<br><br>c. Anna: Exactly! Music has such a powerful way of lifting our spirits.",
+  choices: ["A. a – b – c", "B. a – c – b", "C. b – a – c", "D. c – b – a"]
+},
+{
+  q: "Question 2",
+  passage: "a. Furthermore, the high cost of living in cities often forces people to work longer hours, leading to a poor work-life balance.<br>b. In conclusion, while urban areas offer numerous opportunities, the associated social and financial pressures cannot be ignored.<br>c. However, this rapid growth brings about significant challenges, such as housing shortages and increased pollution levels.<br>d. Urbanization has become a global phenomenon, with more people moving to cities in search of better job prospects and modern amenities.<br>e. Consequently, many urban residents struggle to find affordable accommodation near their workplaces, resulting in long daily commutes.",
+  choices: ["A. d – c – e – a – b", "B. d – a – c – e – b", "C. c – d – e – a – b", "D. d – c – a – e – b"]
+},
+{
+  q: "Question 3",
+  passage: "a. Traditional gatherings such as family dinners and neighborhood events have long provided opportunities for people to strengthen their interpersonal bonds.<br>b. However, the widespread adoption of social networking sites has significantly expanded the ways in which individuals can initiate and nurture relationships.<br>c. Social interaction patterns have changed dramatically in recent decades as digital communication tools have become ubiquitous worldwide.<br>d. This shift has prompted researchers to investigate whether online friendships offer the same psychological benefits as those formed through physical proximity.<br>e. Consequently, many experts now suggest maintaining a healthy balance between virtual connections and real-world social engagements for optimal well-being.",
+  choices: ["A. a – c – b – e – d", "B. c – a – b – d – e", "C. c – b – a – d – e", "D. c – a – d – b – e"]
+},
+{
+  q: "Question 4",
+  passage: "Dear Valued Residents,<br>a. Therefore, we kindly request all households to separate their organic waste from recyclable materials starting next Monday.<br>b. We are writing to inform you about our new “Green Community” initiative aimed at reducing the neighborhood’s carbon footprint.<br>c. For further details on the new collection schedule, please refer to the pamphlet attached to this notice.<br>d. We believe that through these small collective actions, we can significantly improve the local environment for our children.<br>e. In addition, special bins for plastic and glass will be placed at the end of each street to facilitate this process.<br>Yours sincerely,<br>The Residents’ Committee",
+  choices: ["A. b – e – a – d – c", "B. b – a – e – d – c", "C. a – b – e – d – c", "D. b – a – e – c – d"]
+},
+{
+  q: "Question 5",
+  passage: "a. Anna: Me too! Did you try the new coffee shop on Main Street?<br>b. Ben: I love spending weekends exploring new places.<br>c. Anna: Yes, their latte was amazing. We should go there together sometime.<br>d. Ben: Absolutely! How about next Saturday?<br>e. Anna: That sounds perfect!",
+  choices: ["A. b – a – c – d – e", "B. a – c – b – e – d", "C. b – c – a – e – d", "D. a – b – d – c – e"]
+},
+];
+
+// ĐÁP ÁN + GIẢI THÍCH
+const keys = [
+  {
+    ans: "A",
+    explain: "Thứ tự đúng là a – b – c vì đây là một đoạn hội thoại tự nhiên: Anna mở đầu bằng cảm xúc, Ben phản hồi đồng tình, và Anna kết luận bằng nhận xét chung về âm nhạc. \n\nDịch: Anna nói vừa nghe bài APT và rất vui; Ben đồng tình và cho biết bài hát giúp anh ấy có tâm trạng tốt; Anna kết luận rằng âm nhạc có sức mạnh nâng cao tinh thần."
+  },
+  {
+    ans: "A",
+    explain: "Câu d mở đầu giới thiệu hiện tượng đô thị hóa, câu c nêu vấn đề phát sinh, câu e và a phân tích hệ quả cụ thể, và câu b kết luận toàn đoạn. Đây là cấu trúc chuẩn: mở bài → vấn đề → hệ quả → kết luận. \n\nDịch: Đô thị hóa là xu hướng toàn cầu… tuy nhiên nó gây ra nhiều thách thức như thiếu nhà ở… kết quả là nhiều người phải đi làm xa… cuối cùng là kết luận về áp lực xã hội và tài chính."
+  },
+  {
+    ans: "B",
+    explain: "Câu c mang tính khái quát nên đặt đầu đoạn, câu a bổ sung ví dụ truyền thống, câu b chuyển sang tương tác trực tuyến, câu d nêu vấn đề nghiên cứu, và câu e đưa ra khuyến nghị. \n\nDịch: Mô hình giao tiếp xã hội đã thay đổi mạnh mẽ… từ gặp gỡ trực tiếp đến mạng xã hội… vì vậy các chuyên gia khuyên nên cân bằng giữa kết nối ảo và đời thực."
+  },
+  {
+    ans: "B",
+    explain: "Câu b mở đầu đúng chuẩn thư thông báo, câu a và e trình bày yêu cầu cụ thể, câu d nhấn mạnh lợi ích chung, và câu c kết thúc bằng hướng dẫn thêm. \n\nDịch: Ban quản lý thông báo về sáng kiến cộng đồng xanh… yêu cầu phân loại rác… tin rằng hành động nhỏ sẽ cải thiện môi trường… và cung cấp thông tin chi tiết kèm theo."
+  },
+  {
+    ans: "A",
+    explain: "Câu b giới thiệu sở thích, câu a nối tiếp bằng câu hỏi tự nhiên, các câu còn lại phát triển thành lời mời và phản hồi hoàn chỉnh. \n\nDịch: Ben nói thích khám phá nơi mới vào cuối tuần; Anna hỏi về quán cà phê mới; họ cùng lên kế hoạch đi cùng nhau."
+  }
+];
+
+let cur=0;
+loadQ();
+
+function loadQ(){
+  document.getElementById('reading').innerHTML=
+    `<strong>${exercises[cur].q}</strong><br><br>${exercises[cur].passage}`;
+
+  let h="";
+  exercises[cur].choices.forEach((c,i)=>{
+    h+=`<label><input type="radio" name="opt" onchange="answers[cur]='${c[0]}';"${answers[cur]==c[0]?'checked':''}>${c}</label>`;
+  });
+  document.getElementById('questions').innerHTML=h;
+}
+
+function nextQ(){if(cur<4){cur++;loadQ();}}
+function prevQ(){if(cur>0){cur--;loadQ();}}
+
+function openConfirm(){document.getElementById('confirmBox').style.display='flex';}
+function closeConfirm(){document.getElementById('confirmBox').style.display='none';}
+
+function submitTest(){
+  clearInterval(timerInterval);
+  let score = 0;
+  let res = `<h3>Kết quả</h3>`;
+
+  answers.forEach((a,i)=>{
+    const correct = keys[i].ans;
+    if(a === correct) score++;
+
+    res += `
+      <hr>
+      <p><strong>Câu ${i+1}</strong></p>
+      <p>Đáp án của bạn: <b>${a ?? "Chưa chọn"}</b></p>
+      <p>Đáp án đúng: <b>${correct}</b></p>
+      <p><em>Giải thích:</em><br>${keys[i].explain.replace(/\n/g,"<br>")}</p>
+    `;
+  });
+
+  res = `<p><b>Bạn đúng ${score}/5 câu</b></p>` + res;
+
+  document.getElementById('answerBox').innerHTML = res;
+  closeConfirm();
+}
+</script>
+
+<script>
+// ========== HIGHLIGHT + CLICK-TO-REMOVE ==========
+let selectedNodes = new Set();
+
+// TÔ MÀU
+document.addEventListener("mouseup", function () {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  if (range.toString().trim().length === 0) return;
+
+  const span = document.createElement("span");
+  span.className = "highlighted";
+  span.textContent = range.toString();
+  range.deleteContents();
+  range.insertNode(span);
+  selectedNodes.add(span);
+  sel.removeAllRanges();
+});
+
+// CLICK ĐỂ BỎ TÔ MÀU
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("highlighted")) {
+    selectedNodes.delete(e.target);
+    const textNode = document.createTextNode(e.target.textContent);
+    e.target.replaceWith(textNode);
+  }
+});
+</script>
+
+</body>
+</html>
